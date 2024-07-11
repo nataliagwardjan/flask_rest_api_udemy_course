@@ -3,6 +3,7 @@ from flask import jsonify, request
 from book_library_app.models import Author, AuthorSchema, author_schema
 
 
+
 @app.route('/api/v1/authors', methods=['GET'])
 def get_authors():
     authors = Author.query.all()
