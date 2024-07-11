@@ -16,8 +16,8 @@ class Author(db.Model):
 
 class AuthorSchema(Schema):
     id = fields.Integer(dump_only=True)
-    first_name = fields.String(required=True, validate=validate.Length(50))
-    second_name = fields.String(required=True, validate=validate.Length(50))
+    first_name = fields.String(required=True, validate=validate.Length(max=50))
+    second_name = fields.String(required=True, validate=validate.Length(max=50))
     birth_date = fields.Date("%d-%m-%Y", required=True)
 
     @validates("birth_date")

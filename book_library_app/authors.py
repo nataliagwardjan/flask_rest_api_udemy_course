@@ -1,7 +1,8 @@
 from book_library_app import app, db
 from flask import jsonify, request
+from webargs.flaskparser import use_args
 from book_library_app.models import Author, AuthorSchema, author_schema
-
+from book_library_app.utils import validate_json_content_type
 
 
 @app.route('/api/v1/authors', methods=['GET'])
@@ -29,18 +30,16 @@ def get_author(author_id: int):
 
 
 @app.route('/api/v1/authors', methods=['POST'])
-def create_author():
-    body = request.get_json()
-    first_name = body['first_name']
-    second_name = body['second_name']
-    birth_date = body['birth_date']
-    author = Author(first_name=first_name, second_name=second_name, birth_date=birth_date)
+@validate_json_content_type
+@use_args(author_schema, error_status_code=400)
+def create_author(body: dict):
+    author = Author(**body)
     print(author)
     db.session.add(author)
     db.session.commit()
     response = {
         "success": True,
-        "data": "New author has been created"
+        "data": author_schema.dump(author)
     }
 
     return jsonify(response), 201

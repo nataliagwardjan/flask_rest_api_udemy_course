@@ -13,3 +13,4 @@ migrate = Migrate(app, db)
 from book_library_app import authors
 from book_library_app import models
 from book_library_app import db_manage_commends
+from book_library_app import errors

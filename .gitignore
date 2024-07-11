@@ -1,0 +1,14 @@
+# created by virtualenv automatically
+venv/*
+
+# do not add file/folders with dot at begining
+.*
+.idea/**
+venv/**
+__pycache__/**
+*.db
+**/__pycache__/**
+schema_of_project.md
+
+# do not add database
+migrations/**
