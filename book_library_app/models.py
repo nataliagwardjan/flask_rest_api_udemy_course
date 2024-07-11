@@ -1,5 +1,6 @@
 from book_library_app import db
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, validate, validates, ValidationError
+from datetime import datetime
 
 
 class Author(db.Model):
@@ -14,10 +15,15 @@ class Author(db.Model):
 
 
 class AuthorSchema(Schema):
-    id = fields.Integer()
-    first_name = fields.String()
-    second_name = fields.String()
-    birth_date = fields.Date("%d-%m-%Y")
+    id = fields.Integer(dump_only=True)
+    first_name = fields.String(required=True, validate=validate.Length(50))
+    second_name = fields.String(required=True, validate=validate.Length(50))
+    birth_date = fields.Date("%d-%m-%Y", required=True)
+
+    @validates("birth_date")
+    def validate_birth_date(self, value):
+        if value > datetime.now().date():
+            raise ValidationError(f"Birth date must be lower then {datetime.now().date()}")
 
 
 author_schema = AuthorSchema()
