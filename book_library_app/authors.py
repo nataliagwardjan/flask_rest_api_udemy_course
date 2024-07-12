@@ -8,10 +8,10 @@ from book_library_app.utils import validate_json_content_type
 @app.route('/api/v1/authors', methods=['GET'])
 def get_authors():
     authors = Author.query.all()
-    author_schema = AuthorSchema(many=True)
+    authors_schema = AuthorSchema(many=True)
     response = {
         "success": True,
-        "data": author_schema.dump(authors),
+        "data": authors_schema.dump(authors),
         "number_of_records": len(authors)
     }
 
@@ -46,10 +46,20 @@ def create_author(body: dict):
 
 
 @app.route('/api/v1/authors/<int:author_id>', methods=['PUT'])
-def update_author(author_id: int):
+@validate_json_content_type
+@use_args(author_schema, error_status_code=400)
+def update_author(args: dict, author_id: int):
+    author = Author.query.get_or_404(author_id, description=f"Author with id {author_id} not found")
+
+    author.first_name = args["first_name"]
+    author.second_name = args["second_name"]
+    author.birth_date = args["birth_date"]
+
+    db.session.commit()
+
     response = {
         "success": True,
-        "data": f"Update author author with id {author_id}"
+        "data": author_schema.dump(author)
     }
 
     return jsonify(response)
@@ -57,6 +67,11 @@ def update_author(author_id: int):
 
 @app.route('/api/v1/authors/<int:author_id>', methods=['DELETE'])
 def remove_author(author_id: int):
+    author = Author.query.get_or_404(author_id, description=f"Author with id {author_id} not found")
+
+    db.session.delete(author)
+    db.session.commit()
+
     response = {
         "success": True,
         "data": f"Delete author with id {author_id}"
