@@ -7,8 +7,15 @@ from book_library_app.utils import validate_json_content_type
 
 @app.route('/api/v1/authors', methods=['GET'])
 def get_authors():
-    authors = Author.query.all()
-    authors_schema = AuthorSchema(many=True)
+    query = Author.query
+
+    schema_args = Author.get_schema_args(request.args.get("fields"))
+    query = Author.apply_order(query, request.args.get("sort"))
+    query = Author.apply_filter(query, request.args)
+    authors = query.all()
+    authors_schema = AuthorSchema(**schema_args)
+
+
     response = {
         "success": True,
         "data": authors_schema.dump(authors),
