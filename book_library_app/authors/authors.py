@@ -43,7 +43,7 @@ def get_author(author_id: int):
 @use_args(author_schema, error_status_code=400)
 def create_author(body: dict):
     author = Author(**body)
-    print(author)
+
     db.session.add(author)
     db.session.commit()
     response = {

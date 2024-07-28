@@ -37,12 +37,17 @@ class Book(db.Model):
     def __repr__(self):
         return f"<{self.__class__.__name__}>: {self.title}, {self.author.first_name} {self.author.second_name} "
 
+    @staticmethod
+    def additional_validation(param: str, value: str) -> str:
+        return value
+
 
 class AuthorSchema(Schema):
     id = fields.Integer(dump_only=True)
     first_name = fields.String(required=True, validate=validate.Length(max=50))
     second_name = fields.String(required=True, validate=validate.Length(max=50))
     birth_date = fields.Date("%d-%m-%Y", required=True)
+    books = fields.List(fields.Nested(lambda: BookSchema(exclude=["author"])))
 
     @validates("birth_date")
     def validate_birth_date(self, value):
@@ -50,4 +55,20 @@ class AuthorSchema(Schema):
             raise ValidationError(f"Birth date must be lower then {datetime.now().date()}")
 
 
+class BookSchema(Schema):
+    id = fields.Integer(dump_only=True)
+    title = fields.String(required=True, validate=validate.Length(max=50))
+    isbn = fields.Integer(required=True)
+    number_of_pages = fields.Integer(required=True)
+    description = fields.String()
+    author_id = fields.Integer(load_only=True)
+    author = fields.Nested(lambda: AuthorSchema(only=["id", "first_name", "second_name"]))
+
+    @validates("isbn")
+    def validate_isbn(self, value):
+        if len(str(value)) != 13:
+            raise ValidationError(f"ISBN must contains 13 digits")
+
+
 author_schema = AuthorSchema()
+book_schema = BookSchema()
