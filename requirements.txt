@@ -13,6 +13,7 @@ MarkupSafe==2.1.5
 marshmallow==3.21.3
 packaging==24.1
 pycparser==2.22
+PyJWT==2.8.0
 PyMySQL==1.1.1
 python-dotenv==1.0.1
 SQLAlchemy==2.0.31
