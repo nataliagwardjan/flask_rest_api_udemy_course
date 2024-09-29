@@ -104,6 +104,12 @@ class UserSchema(Schema):
     creation_date = fields.DateTime(dump_only=True)
 
 
+class UserPasswordUpdateSchema(Schema):
+    current_password = fields.String(required=True, load_only=True, validate=validate.Length(min=6, max=255))
+    new_password = fields.String(required=True, load_only=True, validate=validate.Length(min=6, max=255))
+
+
 author_schema = AuthorSchema()
 book_schema = BookSchema()
 user_schema = UserSchema()
+user_password_update_schema = UserPasswordUpdateSchema()
