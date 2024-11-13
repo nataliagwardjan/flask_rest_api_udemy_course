@@ -1,7 +1,7 @@
 from book_library_app.auth import auth_bp
 from book_library_app.utils import validate_json_content_type, token_required
 from webargs.flaskparser import use_args
-from book_library_app.models import user_schema, User, UserSchema, user_password_update_schema, UserPasswordUpdateSchema
+from book_library_app.models import user_schema, User, UserSchema, user_password_update_schema
 from flask import jsonify, abort
 from book_library_app import db
 
@@ -28,7 +28,7 @@ def register(args: dict):
         "token": token
     }
 
-    return jsonify(response)
+    return jsonify(response), 201
 
 
 @auth_bp.route('/login', methods=['POST'])
@@ -56,7 +56,10 @@ def login(args: dict):
 @auth_bp.route('/me', methods=['GET'])
 @token_required
 def get_current_user(user_id: int):
-    user = User.query.get_or_404(user_id, description=f"User with id {user_id} not found")
+    user = db.session.get(User, user_id)
+    if not user:
+        abort(404, description=f"User with id {user_id} not found")
+    #user = User.query.get_or_404(user_id, description=f"User with id {user_id} not found")
     response = {
         "success": True,
         "data": user_schema.dump(user)

@@ -8,9 +8,26 @@ load_dotenv(env_file)
 
 
 class Config:
-    #DEBUG = True
+    # DEBUG = True
     SECRET_KEY = os.environ.get("SECRET_KEY")
-    SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI")
+    SQLALCHEMY_DATABASE_URI = ""
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     PER_PAGE = 5
     JWT_EXPIRED_MINUTES = 30
+
+
+class DevelopmentConfig(Config):
+    SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI")
+
+
+class TestingConfig(Config):
+    DB_FILE_PATH = base_dir / 'tests' / 'test.db'
+    SQLALCHEMY_DATABASE_URI = f"sqlite:///{DB_FILE_PATH}"
+    DEBUG = True
+    TESTING = True
+
+
+config = {
+    "development": DevelopmentConfig,
+    "testing": TestingConfig
+}
